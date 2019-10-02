@@ -6,9 +6,9 @@ before_script:
   - mkdir ../build
   - cd ../build
 script:
-  - cmake ../mp2-lab3-stack
+  - cmake ../Stack
   - make -j
   - cd ./bin/
-  - ./test_tstack --gtest_list_tests
+  - ./test_stack --gtest_list_tests
 notifications:
   email: false
