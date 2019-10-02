@@ -112,7 +112,7 @@ public:
 		while (Head != NULL) pop();
 	}
 	virtual T pop(void) {
-		if(IsEmpty()) throw exception("Incorrect lenght");
+		if(IsEmpty()) throw exception();
 		Node* tmp = Head->pPr;
 		T tmp2 = Head->data;
 		delete Head;
