@@ -2,23 +2,125 @@
 #include <iostream>
 
 using namespace std;
+#define STACK_BY_LIST //Закоментировать для реализации стека через массив
 
-const int MaxMemSize = 25; // максимальный размер памяти для стека
+#ifndef STACK_BY_LIST 
 
-typedef int TELEM; // тип элемента 
-
+template <typename T>
 class TStack {
 protected: // поля
-	TELEM* pMem; // указатель на массив элементов
+	T* pMem; // указатель на массив элементов
 	int MemSize; // размер памяти 
 	int DataCount; // количество элементов
-	int Hi; // индекс вершины стека
-	virtual int GetNextIndex (int index); // получить следующий индекс
+
 public:
-	TStack (int Size = MaxMemSize);//конструктор
+	TStack (int Size = 15);//конструктор
 	~TStack(); //деструктор
 	int IsEmpty ( void ) const ; // контроль пустоты
 	int IsFull ( void ) const ; // контроль переполнения
-	void Put ( const TELEM&Val );// добавить значение
-	virtual TELEM Get ( void ) ; // извлечь значение
+	void Put ( const T& Val );// добавить значение
+	void Clear() { DataCount = 0; }
+	virtual T Get ( void ) ; // извлечь значение
 };
+
+
+
+template<typename T>
+inline TStack<T>::TStack(int Size)
+{
+	if (Size < 0) throw exception("Incorrect lenght");
+	pMem = new T[Size];
+	DataCount = 0;
+	MemSize = Size;
+}
+
+template<typename T>
+inline TStack<T>::~TStack()
+{
+	delete[] pMem;
+}
+
+template<typename T>
+inline int TStack<T>::IsEmpty(void) const
+{
+	return (DataCount==0);
+}
+
+template<typename T>
+inline int TStack<T>::IsFull(void) const
+{
+	return (DataCount == MemSize);
+}
+
+template<typename T>
+inline void TStack<T>::Put(const T& Val)
+{
+	if (IsFull()) {
+		delete[] pMem;
+		MemSize = MemSize + MemSize / 3 + 1;
+		pMem = new T[MemSize];
+	}
+	pMem[DataCount++] = Val;
+}
+
+template<typename T>
+inline T TStack<T>::Get(void)
+{
+	if (IsEmpty()) throw exception("No elements here");
+	return pMem[(DataCount--) -1];
+}
+
+#else
+template <typename T>
+class TStack {
+protected: // поля
+	
+	class Node
+	{
+	public:
+		Node* pPr;
+		T data;
+		Node(T data, Node* pPr = NULL) {
+			this->data = data;
+			this->pPr = pPr;
+		}
+	};
+	int MemSize; // размер памяти 
+	int DataCount; // количество элементов
+	Node* Head;
+
+
+public:
+	TStack(int Size = 15) {
+		Head = NULL;
+		MemSize = 0;
+		DataCount = 0;
+	}//конструктор
+	~TStack() {
+		Clear();
+	} //деструктор
+	bool IsEmpty(void) const { return DataCount == 0; } // контроль пустоты
+	bool IsFull(void) const {
+		return false;
+	}; // контроль переполнения, не нужен в этой реализации
+	void Put(const T& Val) {
+		Node* node = new Node(Val,Head);
+		Head = node;
+		++DataCount;
+	};// добавить значение
+	void Clear() {
+		while (Head != NULL) Get();
+	}
+	virtual T Get(void) {
+		if(IsEmpty()) throw exception("Incorrect lenght");
+		Node* tmp = Head->pPr;
+		T tmp2 = Head->data;
+		delete Head;
+		Head = tmp;
+		--DataCount;
+		return tmp2;
+	}// извлечь значение
+};
+
+
+#endif // ! 
