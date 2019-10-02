@@ -15,12 +15,15 @@ protected: // поля
 
 public:
 	TStack (int Size = 15);//конструктор
+	TStack(const TStack& st);
 	~TStack(); //деструктор
 	int IsEmpty ( void ) const ; // контроль пустоты
 	int IsFull ( void ) const ; // контроль переполнения
 	void push ( const T& Val );// добавить значение
 	void clear() { DataCount = 0; }
-	virtual T pop ( void ) ; // извлечь значение
+	TStack<T>& operator=(const TStack& st);
+	T top() { return pMem[DataCount - 1]; }
+	T pop ( void ) ; // извлечь значение
 };
 
 
@@ -32,6 +35,14 @@ inline TStack<T>::TStack(int Size)
 	pMem = new T[Size];
 	DataCount = 0;
 	MemSize = Size;
+}
+
+template<typename T>
+inline TStack<T>::TStack(const TStack<T>& st)
+{
+	MemSize = st.MemSize; DataCount = st.DataCount;
+	pMem = new T[st.MemSize];
+	for (int i = 0; i < DataCount; ++i)pMem[i] = st.pMem[i];
 }
 
 template<typename T>
@@ -56,11 +67,30 @@ template<typename T>
 inline void TStack<T>::push(const T& Val)
 {
 	if (IsFull()) {
+		T* tmp = new T[MemSize];
+		for (int i = 0; i < DataCount; ++i) tmp[i]= pMem[i];
 		delete[] pMem;
 		MemSize = MemSize + MemSize / 3 + 1;
 		pMem = new T[MemSize];
+		for (int i = 0; i < DataCount; ++i) pMem[i] = tmp[i];
+		delete[] tmp;
 	}
 	pMem[DataCount++] = Val;
+}
+
+template<typename T>
+inline TStack<T>& TStack<T>::operator=(const TStack& st)
+{	
+	if (this != &st) {
+		DataCount = st.DataCount;
+		if (MemSize != st.MemSize) {
+			delete[] pMem;
+			pMem = new T[st.MemSize];
+			MemSize = st.MemSize;
+		}
+		for (int i = 0; i < MemSize; ++i) pMem[i] = st.pMem[i];
+	}
+	return *this;
 }
 
 template<typename T>
@@ -79,47 +109,94 @@ protected: // поля
 	{
 	public:
 		Node* pPr;
+		Node* pNext;
 		T data;
-		Node(T data, Node* pPr = NULL) {
+		Node(T data, Node* pPr = NULL,Node* pNext=NULL) {
 			this->data = data;
 			this->pPr = pPr;
+			this->pNext = pNext;
 		}
 	};
-	int MemSize; // размер памяти 
-	int DataCount; // количество элементов
-	Node* Head;
+	int DataCount; // количество элементов совпадает с размером памяти
+	Node* Head; //верхний элемент
+	Node* Tail; //нижний элемент списка
 
 
 public:
 	TStack(int Size = 15) {
-		Head = NULL;
-		MemSize = 0;
+		Tail=Head = NULL;
 		DataCount = 0;
 	}//конструктор
+	TStack(const TStack& st) {
+		DataCount = st.DataCount;
+		Tail=Head = NULL;
+		if (DataCount) {
+			Node* tmp = new Node(st.Tail->data, Head);
+			Head = tmp;
+			Tail = tmp;
+			Node* t = st.Tail->pNext;
+			for (int i = 1; i < DataCount; ++i) {
+				Node* tmp = new Node(t->data, Head);
+				Head->pNext = Head;
+				Head = tmp;
+				t = t->pNext;
+			}
+		}
+	}
 	~TStack() {
 		clear();
 	} //деструктор
 	bool IsEmpty(void) const { return DataCount == 0; } // контроль пустоты
-	bool IsFull(void) const {
-		return false;
-	}; // контроль переполнения, не нужен в этой реализации
+	bool IsFull(void) const { return false; } // контроль переполнения, не нужен в этой реализации
+	
+	TStack<T>& operator=(const TStack& st) {
+		if (this != &st) {
+			this->clear(); //Сводим задачу к предыдущей
+			DataCount = st.DataCount;
+			Tail = Head = NULL;
+			if (DataCount) {
+				Node* tmp = new Node(st.Tail->data, Head);
+				Head = tmp;
+				Tail = tmp;
+				Node* t = st.Tail->pNext;
+				for (int i = 1; i < DataCount; ++i) {
+					Node* tmp = new Node(t->data, Head);
+					Head->pNext = Head;
+					Head = tmp;
+					t = t->pNext;
+				}
+			}
+		}
+		return *this;
+	}
+
 	void push(const T& Val) {
 		Node* node = new Node(Val,Head);
+		if (IsEmpty()) Tail = node; 
+		else Head->pNext = node;
 		Head = node;
 		++DataCount;
 	};// добавить значение
+
 	void clear() {
 		while (Head != NULL) pop();
 	}
-	virtual T pop(void) {
+
+	T pop(void) {
 		if(IsEmpty()) throw exception();
 		Node* tmp = Head->pPr;
 		T tmp2 = Head->data;
+		//if (Tail == Head) Tail = NULL; //Надо ли оно???
 		delete Head;
 		Head = tmp;
 		--DataCount;
 		return tmp2;
 	}// извлечь значение
+
+	T top(void) {
+		if (IsEmpty()) throw exception();
+		return Head->data;
+	}
 };
 
 

@@ -17,8 +17,8 @@ public:
 		return st2.pop();
 	}
 	void shift() { //Перемещение элементов из 1 стека во второй
-		while (!st1.IsEmpty())
-		{
+		if (st2.IsEmpty()) {
+			while (!st1.IsEmpty())
 			st2.push(st1.pop());
 		}
 	}
