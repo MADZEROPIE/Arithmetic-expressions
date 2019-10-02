@@ -18,9 +18,9 @@ public:
 	~TStack(); //деструктор
 	int IsEmpty ( void ) const ; // контроль пустоты
 	int IsFull ( void ) const ; // контроль переполнения
-	void Put ( const T& Val );// добавить значение
-	void Clear() { DataCount = 0; }
-	virtual T Get ( void ) ; // извлечь значение
+	void push ( const T& Val );// добавить значение
+	void clear() { DataCount = 0; }
+	virtual T pop ( void ) ; // извлечь значение
 };
 
 
@@ -53,7 +53,7 @@ inline int TStack<T>::IsFull(void) const
 }
 
 template<typename T>
-inline void TStack<T>::Put(const T& Val)
+inline void TStack<T>::push(const T& Val)
 {
 	if (IsFull()) {
 		delete[] pMem;
@@ -64,7 +64,7 @@ inline void TStack<T>::Put(const T& Val)
 }
 
 template<typename T>
-inline T TStack<T>::Get(void)
+inline T TStack<T>::pop(void)
 {
 	if (IsEmpty()) throw exception("No elements here");
 	return pMem[(DataCount--) -1];
@@ -97,21 +97,21 @@ public:
 		DataCount = 0;
 	}//конструктор
 	~TStack() {
-		Clear();
+		clear();
 	} //деструктор
 	bool IsEmpty(void) const { return DataCount == 0; } // контроль пустоты
 	bool IsFull(void) const {
 		return false;
 	}; // контроль переполнения, не нужен в этой реализации
-	void Put(const T& Val) {
+	void push(const T& Val) {
 		Node* node = new Node(Val,Head);
 		Head = node;
 		++DataCount;
 	};// добавить значение
-	void Clear() {
-		while (Head != NULL) Get();
+	void clear() {
+		while (Head != NULL) pop();
 	}
-	virtual T Get(void) {
+	virtual T pop(void) {
 		if(IsEmpty()) throw exception("Incorrect lenght");
 		Node* tmp = Head->pPr;
 		T tmp2 = Head->data;
