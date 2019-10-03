@@ -109,7 +109,6 @@ protected: // поля
 	{
 	public:
 		Node* pPr;
-		Node* pNext;
 		T data;
 		Node(T data, Node* pPr = NULL) {
 			this->data = data;
@@ -166,7 +165,6 @@ public:
 
 	void push(const T& Val) {
 		Node* node = new Node(Val,Head);
-		if(!IsEmpty()) Head->pNext = node;
 		Head = node;
 		++DataCount;
 	};// добавить значение
