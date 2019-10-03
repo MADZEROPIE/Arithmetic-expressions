@@ -6,9 +6,12 @@
 int main()
 {
 	setlocale(LC_ALL, "Russian");
-	TQueue<int> a(10);
-	for (int i = 1; i < 25; ++i) a.push(i * 2);
-	for (int i = 1; i < 25; ++i) cout << a.pop() << ' ';
+	TStack<long long> a(10);
+	for (long long i = 1; i < 46555560; ++i) a.push(i * long long(2));
+	TStack<long long> b(a);
+	//for (long long i = 1; i < 46555561; ++i) b.push(i * long long(3));
+	//b=a;
+	for (int i = 1; i < 25; ++i) cout << b.pop() << ' ';
 
 	return 0;
 }

@@ -2,7 +2,9 @@
 #include <iostream>
 
 using namespace std;
-#define STACK_BY_LIST //Закоментировать для реализации стека через массив
+//#define STACK_BY_LIST //Закоментировать для реализации стека через массив.
+// Быстродействие - довольно забавная штука. Для обработки 46,5 миллионов элементов массив  работает ~3 секунд, список ~27 секунд и при этом список весит в ~8(???) раз больше. (время с выводом на консоль 25 элементов)
+// Вывод: Список, несмотря на асимптотику O(1) в худшем случае, - это Альянс. Сложная шутка, но зато правда.
 
 #ifndef STACK_BY_LIST 
 
@@ -21,6 +23,7 @@ public:
 	int IsFull ( void ) const ; // контроль переполнения
 	void push ( const T& Val );// добавить значение
 	void clear() { DataCount = 0; }
+	int size() { return DataCount; }
 	TStack<T>& operator=(const TStack& st);
 	T top() { return pMem[DataCount - 1]; }
 	T pop ( void ) ; // извлечь значение
@@ -124,6 +127,7 @@ public:
 		Head = NULL;
 		DataCount = 0;
 	}//конструктор
+
 	TStack(const TStack& st) {
 		DataCount = st.DataCount;
 		Head = NULL;
@@ -138,15 +142,17 @@ public:
 			}
 		}
 	}
+
 	~TStack() {
 		clear();
 	} //деструктор
+
 	bool IsEmpty(void) const { return DataCount == 0; } // контроль пустоты
 	bool IsFull(void) const { return false; } // контроль переполнения, не нужен в этой реализации
 	
 	TStack<T>& operator=(const TStack& st) {
 		if (this != &st) {
-			this->clear(); //Сводим задачу к предыдущей
+			this->clear(); //Сводим задачу к предыдущей. Можно попытаться оптимизировать и не удалять Node, а перезаписывать в нём data.
 			DataCount = st.DataCount;
 			Head = NULL;
 			if (DataCount) {
@@ -172,6 +178,8 @@ public:
 	void clear() {
 		while (Head != NULL) pop();
 	}
+
+	int size() { return DataCount; }
 
 	T pop(void) {
 		if(IsEmpty()) throw exception();
