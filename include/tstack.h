@@ -111,35 +111,31 @@ protected: // поля
 		Node* pPr;
 		Node* pNext;
 		T data;
-		Node(T data, Node* pPr = NULL,Node* pNext=NULL) {
+		Node(T data, Node* pPr = NULL) {
 			this->data = data;
 			this->pPr = pPr;
-			this->pNext = pNext;
 		}
 	};
 	int DataCount; // количество элементов совпадает с размером памяти
 	Node* Head; //верхний элемент
-	Node* Tail; //нижний элемент списка
 
 
 public:
 	TStack(int Size = 15) {
-		Tail=Head = NULL;
+		Head = NULL;
 		DataCount = 0;
 	}//конструктор
 	TStack(const TStack& st) {
 		DataCount = st.DataCount;
-		Tail=Head = NULL;
+		Head = NULL;
 		if (DataCount) {
-			Node* tmp = new Node(st.Tail->data, Head);
-			Head = tmp;
-			Tail = tmp;
-			Node* t = st.Tail->pNext;
-			for (int i = 1; i < DataCount; ++i) {
-				Node* tmp = new Node(t->data, Head);
-				Head->pNext = Head;
-				Head = tmp;
-				t = t->pNext;
+			Node* node = new Node(st.Head->data, Head);
+			Head = node;
+			Node* pst = (st.Head)->pPr;
+			while (pst != NULL) {
+				node->pPr = new Node(pst->data);
+				pst = pst->pPr;
+				node = node->pPr;
 			}
 		}
 	}
@@ -153,17 +149,15 @@ public:
 		if (this != &st) {
 			this->clear(); //Сводим задачу к предыдущей
 			DataCount = st.DataCount;
-			Tail = Head = NULL;
+			Head = NULL;
 			if (DataCount) {
-				Node* tmp = new Node(st.Tail->data, Head);
-				Head = tmp;
-				Tail = tmp;
-				Node* t = st.Tail->pNext;
-				for (int i = 1; i < DataCount; ++i) {
-					Node* tmp = new Node(t->data, Head);
-					Head->pNext = Head;
-					Head = tmp;
-					t = t->pNext;
+				Node* node = new Node(st.Head->data, Head);
+				Head = node;
+				Node* pst = (st.Head)->pPr;
+				while (pst != NULL) {
+					node->pPr = new Node(pst->data);
+					pst = pst->pPr;
+					node = node->pPr;
 				}
 			}
 		}
@@ -172,8 +166,7 @@ public:
 
 	void push(const T& Val) {
 		Node* node = new Node(Val,Head);
-		if (IsEmpty()) Tail = node; 
-		else Head->pNext = node;
+		if(!IsEmpty()) Head->pNext = node;
 		Head = node;
 		++DataCount;
 	};// добавить значение
@@ -184,13 +177,12 @@ public:
 
 	T pop(void) {
 		if(IsEmpty()) throw exception();
-		Node* tmp = Head->pPr;
-		T tmp2 = Head->data;
-		//if (Tail == Head) Tail = NULL; //Надо ли оно???
+		Node* tmp_node = Head->pPr;
+		T tmp_data = Head->data;
 		delete Head;
-		Head = tmp;
+		Head = tmp_node;
 		--DataCount;
-		return tmp2;
+		return tmp_data;
 	}// извлечь значение
 
 	T top(void) {
