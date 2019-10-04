@@ -34,7 +34,7 @@ public:
 template<typename T>
 inline TStack<T>::TStack(int Size)
 {
-	if (Size < 0) throw exception("Incorrect lenght");
+	if (Size < 0) throw exception();
 	pMem = new T[Size];
 	DataCount = 0;
 	MemSize = Size;
@@ -45,7 +45,7 @@ inline TStack<T>::TStack(const TStack<T>& st)
 {
 	MemSize = st.MemSize; DataCount = st.DataCount;
 	pMem = new T[st.MemSize];
-	for (int i = 0; i < DataCount; ++i)pMem[i] = st.pMem[i];
+	for (int i = 0; i < DataCount; ++i) pMem[i] = st.pMem[i];
 }
 
 template<typename T>
@@ -99,7 +99,7 @@ inline TStack<T>& TStack<T>::operator=(const TStack& st)
 template<typename T>
 inline T TStack<T>::pop(void)
 {
-	if (IsEmpty()) throw exception("No elements here");
+	if (IsEmpty()) throw "No elements here";
 	return pMem[(DataCount--) -1];
 }
 
