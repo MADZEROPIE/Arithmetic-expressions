@@ -2,8 +2,10 @@
 #include <iostream>
 
 using namespace std;
+
 //#define STACK_BY_LIST //Закоментировать для реализации стека через массив.
-// Быстродействие - довольно забавная штука. Для обработки 46,5 миллионов элементов массив  работает ~3 секунд, список ~27 секунд и при этом список весит в ~8(???) раз больше. (время с выводом на консоль 25 элементов)
+
+// Быстродействие - довольно забавная штука. При обработке 46,5 миллионов элементов массив  работает ~3 секунд, список ~27 секунд и при этом список весит в ~8(???) раз больше. (время с выводом на консоль 25 элементов)
 // Вывод: Список, несмотря на асимптотику O(1) в худшем случае, - это Альянс. Сложная шутка, но зато правда.
 //Замечание: в Release сборке список отрабатывает за ~9-10 секунд и весит около 3 ГБ, массив около 1 секунды и весит 0,8 ГБ.
 
@@ -29,7 +31,7 @@ public:
 	T top() {
 		if (IsEmpty()) throw "No elements here.";
 		return pMem[DataCount - 1]; }
-	T pop ( void ) ; // извлечь значение
+	void pop ( void ) ; // извлечь значение
 };
 
 
@@ -100,10 +102,10 @@ inline TStack<T>& TStack<T>::operator=(const TStack& st)
 }
 
 template<typename T>
-inline T TStack<T>::pop(void)
+inline void TStack<T>::pop(void)
 {
 	if (IsEmpty()) throw "No elements here";
-	return pMem[(DataCount--) -1];
+	--DataCount;
 }
 
 #else
@@ -184,14 +186,12 @@ public:
 
 	int size() { return DataCount; }
 
-	T pop(void) {
+	void pop(void) {
 		if(IsEmpty()) throw exception();
 		Node* tmp_node = Head->pPr;
-		T tmp_data = Head->data;
 		delete Head;
 		Head = tmp_node;
 		--DataCount;
-		return tmp_data;
 	}// извлечь значение
 
 	T top(void) {
