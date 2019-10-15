@@ -2,7 +2,9 @@
 #include "tstack.h"
 #include <string>
 
-//template <typename T> // а зачем здесь вообще шаблон???
+enum state_enum {ORIGIN_STATE, WAIT_FOR_NUM ,ERROR , SUCCESS}; //Перечисление состояний
+
+//template <typename T> // а зачем здесь вообще шаблон???, правильно он не нужен
 class TFormula {
 private:
 	string orig_exp;
