@@ -18,21 +18,23 @@ class TFormula {
 private:
 	string orig_exp;
 	vector<Lexer*> arr;
+	vector<Lexer*> post_arr;
 	state_enum current_state = ORIGIN_STATE;
 public:
 	TFormula(const string& a) { orig_exp = a; }
 	bool check_exp();
 	void make_postfix();
 	real calc();
-	void show();
+	void show_lex();
+	void show_postfix();
 };
 
 
 
-
 class Lexer_real:public Lexer {
-	real a;
 public:
+	real a;
+
 	Lexer_real(const real& b) { a = b; }
 	friend ostream& operator<< (ostream& out, const Lexer_real& num) {
 		return out << num.a;
@@ -40,9 +42,13 @@ public:
 };
 
 class Lexer_operation : public Lexer {
+public:
 	short int priority;
 	operation_enum code;
-public:
+
 	friend ostream& operator<< (ostream& out, const Lexer_operation& op);
+	bool operator==(char op);
+	bool operator>(const Lexer_operation& b) { return priority > b.priority; }
+
 	Lexer_operation(const char& op);
 };

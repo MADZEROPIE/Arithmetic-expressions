@@ -44,3 +44,4 @@ TEST(TStack,empty_stack_is_empty) {
 	TStack<int> st(5);
 	EXPECT_EQ(1, st.IsEmpty());
 }
+
