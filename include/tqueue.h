@@ -12,9 +12,13 @@ public:
 	void push(const T& Val) {
 		st1.push(Val);
 	}
-	T pop(void) {
+	void pop(void) {
 		shift();
 		return st2.pop();
+	}
+	T top(void) {
+		shift();
+		return st2.top();
 	}
 	void shift() { //Перемещение элементов из 1 стека во второй
 		if (st2.IsEmpty()) {

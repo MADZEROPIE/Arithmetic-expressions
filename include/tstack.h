@@ -108,6 +108,36 @@ inline void TStack<T>::pop(void)
 	--DataCount;
 }
 
+template<typename T>
+class TStack_min {
+protected: // поля
+	TStack<T> stack, tmp_stack;
+public:
+	void push(const T& a) {
+		stack.push(a);
+		if (tmp_stack.IsEmpty())  tmp_stack.push(a);
+		else if (tmp_stack.top() >= a)  tmp_stack.push(a);
+	}
+	void pop() {
+		if (stack.top() == tmp_stack.top()) tmp_stack.pop();
+		stack.pop();
+	}
+	T top() {
+		return stack.top();
+	}
+
+	void clear() { stack.clear(); tmp_stack.clear(); }
+	
+	TStack_min<T>& operator=(const TStack_min<T>& b) { 
+		this->stack = b.stack;
+		this->tmp_stack = b.tmp_stack;
+		return *this;
+	}
+
+	T find_min() {
+		return tmp_stack.top();
+	}
+};
 #else
 template <typename T>
 class TStack {
