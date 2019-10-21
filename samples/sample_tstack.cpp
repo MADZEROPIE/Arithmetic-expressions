@@ -1,6 +1,7 @@
 #include <iostream>
 #include "tstack.h"
 #include "tqueue.h"
+#include "TFormula.h"
 
 bool check(char* arr) {
 	TStack<char> stack;
@@ -19,11 +20,13 @@ bool check(char* arr) {
 	return true;
 }
 
+
+
+
 int main(int argc, char** argv)
 {
 	setlocale(LC_ALL, "Russian");
 	if (argc > 1) cout << check(argv[1])<<endl;
-	
 	TStack_min<int> a;
 	a.push(3); a.push(7); a.push(3); a.push(2);
 	cout << a.find_min() << endl;
