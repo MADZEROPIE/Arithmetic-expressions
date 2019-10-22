@@ -272,10 +272,10 @@ ostream& operator<<(ostream& out, const Lexer_operation& op)
 	case close_bracket:
 		out << ')';
 		break;
-	case op_plus:
+	case op_plus: op_un_plus:
 		out << '+';
 		break;
-	case op_minus:
+	case op_minus: op_un_min:
 		out << '-';
 		break;
 	case op_mult:
