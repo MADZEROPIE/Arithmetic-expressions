@@ -30,6 +30,13 @@ void TFormula::make_postfix()
 	}
 }
 
+TFormula::~TFormula()
+{
+	for (auto elem : arr) delete elem;
+
+	//Все указатели лежат в arr, поэтому не надо удалять элементы в post_arr
+}
+
 bool TFormula::check_exp()
 {
 	TStack<char> brackets;
