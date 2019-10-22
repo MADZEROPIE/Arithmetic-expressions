@@ -7,7 +7,7 @@
 typedef double real;
 
 enum state_enum {ORIGIN_STATE=0, WAIT_FOR_OP ,ERROR , SUCCESS}; //Перечисление состояний
-enum operation_enum {open_bracket, close_bracket, op_plus, op_minus, op_mult, op_div, op_pow, op_exp, op_cos,op_sin };
+enum operation_enum {open_bracket, close_bracket, op_plus, op_minus, op_mult, op_div, op_pow, op_un_plus, op_un_min, op_exp, op_cos,op_sin };
 
 class Lexer {
 	friend ostream& operator<< (ostream& out, const Lexer& op);
@@ -51,4 +51,5 @@ public:
 	bool operator>(const Lexer_operation& b) { return priority > b.priority; }
 
 	Lexer_operation(const char& op);
+	Lexer_operation(const operation_enum& op);
 };
