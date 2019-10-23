@@ -3,11 +3,12 @@
 #include <string>
 #include <vector>
 #include <cmath>
+#include <map>
 
 typedef double real;
 
-enum state_enum {ORIGIN_STATE=0, WAIT_FOR_OP ,ERROR , SUCCESS}; //Перечисление состояний
-enum operation_enum {open_bracket, close_bracket, op_plus, op_minus, op_mult, op_div, op_pow, op_un_plus, op_un_min, op_exp, op_cos,op_sin };
+enum state_enum { WAIT_FOR_INPUT, ORIGIN_STATE, WAIT_FOR_OP ,ERROR , CHECK_DONE, POSTFIX_DONE }; //Перечисление состояний
+enum operation_enum {open_bracket, close_bracket, op_plus, op_minus, op_mult, op_div, op_pow, op_un_plus, op_un_min, op_exp, op_cos, op_sin, op_ln };
 
 class Lexer {
 public:
@@ -17,12 +18,16 @@ public:
 
 class TFormula {
 private:
-	string orig_exp;
-	vector<Lexer*> arr;
-	vector<Lexer*> post_arr;
+	vector<string> orig_exp_arr;
+	vector<vector<Lexer*> >arr;
+	vector<vector<Lexer*> > post_arr;
+	//map<string, Lexer*> op_list; // Список операций НЕ РАБОТАЕТ!!!
+	//map<string, Lexer*> name_list; //Имена переменных НЕ РАБОТАЕТ!!!
 	state_enum current_state = ORIGIN_STATE;
 public:
-	TFormula(const string& a) { orig_exp = a; }
+	TFormula();
+	TFormula(const string& a):TFormula() { orig_exp_arr.push_back (a); }
+	TFormula(const vector<string>& vec): TFormula() { orig_exp_arr = vec; }
 	~TFormula();
 	bool check_exp();
 	void make_postfix();
