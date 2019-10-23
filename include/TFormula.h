@@ -21,7 +21,7 @@ private:
 	vector<string> orig_exp_arr;
 	vector<vector<Lexer*> >arr;
 	vector<vector<Lexer*> > post_arr;
-	//map<string, Lexer*> op_list; // Список операций НЕ РАБОТАЕТ!!!
+	map<string, Lexer*> op_list; // Список операций НЕ РАБОТАЕТ!!!
 	//map<string, Lexer*> name_list; //Имена переменных НЕ РАБОТАЕТ!!!
 	state_enum current_state = ORIGIN_STATE;
 public:

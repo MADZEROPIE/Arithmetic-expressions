@@ -35,21 +35,21 @@ void TFormula::make_postfix()
 }
 
 TFormula::TFormula() //Копипаста - это плохо...
-{/*
+{
 	Lexer* op = new Lexer_operation(open_bracket);
 	op_list.emplace("(", op);
 	op = new Lexer_operation(close_bracket);
 	op_list.emplace(")", op);
 	op = new Lexer_operation(op_plus);
-	op_list.emplace('+', op);
+	op_list.emplace("+", op);
 	op = new Lexer_operation(op_minus);
-	op_list.emplace('-', op);
+	op_list.emplace("-", op);
 	op = new Lexer_operation(op_mult);
-	op_list.emplace('*', op);
+	op_list.emplace("*", op);
 	op = new Lexer_operation(op_div);
-	op_list.emplace('/', op);
+	op_list.emplace("/", op);
 	 op = new Lexer_operation(op_pow);
-	op_list.emplace('^', op);
+	op_list.emplace("^", op);
 	op = new Lexer_operation(op_un_min);
 	op_list.emplace("u-", op);
 	op = new Lexer_operation(op_un_plus);
@@ -59,16 +59,16 @@ TFormula::TFormula() //Копипаста - это плохо...
 	op = new Lexer_operation(op_cos);
 	op_list.emplace("cos", op);
 	op = new Lexer_operation(op_ln);
-	op_list.emplace("ln", op);*/
+	op_list.emplace("ln", op);
 }
 
 TFormula::~TFormula()
 {
 	for(int i=0;i<arr.size();++i) for (auto elem : arr[i]) 
-		//if(dynamic_cast<Lexer_real*>(elem) ) 
-		delete elem;
+		if(dynamic_cast<Lexer_real*>(elem) ) 
+			delete elem;
 	//for (auto it = name_list.begin(); it != name_list.end(); ++it) delete it->second;
-	//for (auto it = op_list.begin(); it != op_list.end(); ++it) delete it->second;
+	for (auto it = op_list.begin(); it != op_list.end(); ++it) delete it->second;
 
 	//Все указатели лежат в arr, поэтому не надо удалять элементы в post_arr
 }
@@ -110,19 +110,20 @@ bool TFormula::check_exp()
 				}
 				else if (orig_exp[k] == '(') {
 					brackets.push('(');
-					Lexer* op = new Lexer_operation(orig_exp[k]);
-					arr[i].push_back(op);
+					//Lexer* op = new Lexer_operation(orig_exp[k]);
+
+					arr[i].push_back(op_list["("]);
 				}
 				else if (orig_exp[k] == '-' || orig_exp[k] == '+') {
 					if (k + 1 >= orig_exp.size()) { current_state = ERROR; k = orig_exp.size(); }
 					else {
 						if (orig_exp[k] == '-') {
-							Lexer* op = new Lexer_operation(op_un_min);
-							arr[i].push_back(op);
+							//Lexer* op = new Lexer_operation(op_un_min);
+							arr[i].push_back(op_list["u-"]);
 						}
 						else {
-							Lexer* op = new Lexer_operation(op_un_plus);
-							arr[i].push_back(op);
+							//Lexer* op = new Lexer_operation(op_un_plus);
+							arr[i].push_back(op_list["u+"]);
 						}
 					}
 				}
@@ -141,8 +142,8 @@ bool TFormula::check_exp()
 					else { current_state = ERROR; k = orig_exp.size(); }
 				}
 				else if (orig_exp[k] == ')') {
-					Lexer* op = new Lexer_operation(orig_exp[k]);
-					arr[i].push_back(op);
+					//Lexer* op = new Lexer_operation(orig_exp[k]);
+					arr[i].push_back(op_list[")"]);
 					if (brackets.IsEmpty()) { current_state = ERROR; k = orig_exp.size(); }
 					else if (brackets.top() == '(') brackets.pop();
 					else { current_state = ERROR; k = orig_exp.size(); }
