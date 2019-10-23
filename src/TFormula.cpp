@@ -36,6 +36,7 @@ void TFormula::make_postfix()
 
 TFormula::TFormula() //Копипаста - это плохо...
 {
+	current_state = WAIT_FOR_INPUT;
 	Lexer* op = new Lexer_operation(open_bracket);
 	op_list.emplace("(", op);
 	op = new Lexer_operation(close_bracket);
@@ -60,15 +61,21 @@ TFormula::TFormula() //Копипаста - это плохо...
 	op_list.emplace("cos", op);
 	op = new Lexer_operation(op_ln);
 	op_list.emplace("ln", op);
+	op = new Lexer_operation(op_exp);
+	op_list.emplace("ln", op);
+	op = new Lexer_operation(op_set);
+	op_list.emplace("=", op);
+
 }
 
 TFormula::~TFormula()
 {
-	for(int i=0;i<arr.size();++i) for (auto elem : arr[i]) 
-		if(dynamic_cast<Lexer_real*>(elem) ) 
-			delete elem;
-	//for (auto it = name_list.begin(); it != name_list.end(); ++it) delete it->second;
-	for (auto it = op_list.begin(); it != op_list.end(); ++it) delete it->second;
+//	for(int i=0;i<arr.size();++i) 
+	//	for (auto elem : arr[i]) 
+//			if(dynamic_cast<Lexer_real*>(elem) ) 
+				//delete elem;
+//	for (auto it = name_list.begin(); it != name_list.end(); ++it) delete it->second;
+//	for (auto it = op_list.begin(); it != op_list.end(); ++it) delete it->second;
 
 	//Все указатели лежат в arr, поэтому не надо удалять элементы в post_arr
 }
@@ -127,19 +134,33 @@ bool TFormula::check_exp()
 						}
 					}
 				}
+				else if ((orig_exp[k] >= 'A' && orig_exp[k] <= 'Z') || (orig_exp[k] >= 'a' && orig_exp[k] <= 'z')) {
+					string name=make_name(orig_exp,k);
+					if (op_list.find(name) != op_list.end()) { arr[i].push_back(op_list[name]); }
+					else if (name_list.find(name) != name_list.end()) {
+						arr[i].push_back(name_list[name]); current_state = WAIT_FOR_OP;
+					}
+					else if (k + 1 < orig_exp.size() && orig_exp[k+1] == '=') {
+						Lexer* num = new Lexer_real(0);
+						name_list.emplace(name, num);
+						arr[i].push_back(num);
+						arr[i].push_back(op_list["="]);
+						++k;
+					}
+					else arr[i].push_back(name_list[name]);
+				}
 				else { current_state = ERROR; k = orig_exp.size(); }
 			}
 			//Закончен ввод числа, ожидание операции
 			else if (current_state == WAIT_FOR_OP) {
 				if (orig_exp[k] == '+' || orig_exp[k] == '-' || orig_exp[k] == '*' || orig_exp[k] == '/' || orig_exp[k] == '^') {
-					Lexer* op = new Lexer_operation(orig_exp[k]);
-					arr[i].push_back(op);
+					string op = { orig_exp[k] };
+					//Lexer* op = new Lexer_operation(orig_exp[k]);
+					arr[i].push_back(op_list[op]);
 					int j = k + 1;
-					if (j < orig_exp.size()) {
-						if ((orig_exp[j] >= '0' && orig_exp[j] <= '9') || orig_exp[j] == '(') current_state = ORIGIN_STATE;
-						else { current_state = ERROR; k = orig_exp.size(); }
-					}
-					else { current_state = ERROR; k = orig_exp.size(); }
+					if (j >= orig_exp.size()) { current_state = ERROR; k = orig_exp.size(); }
+					else if (orig_exp[j] == '+' || orig_exp[j] == '-' || orig_exp[j] == '*' || orig_exp[j] == '/' || orig_exp[j] == '^') { current_state = ERROR; k = orig_exp.size(); }
+					else current_state = ORIGIN_STATE;
 				}
 				else if (orig_exp[k] == ')') {
 					//Lexer* op = new Lexer_operation(orig_exp[k]);
@@ -169,8 +190,31 @@ real TFormula::calc()
 				if (dynamic_cast<Lexer_real*>(post_arr[k][j])) stack.push(dynamic_cast<Lexer_real*>(post_arr[k][j]));
 				else {
 					Lexer_operation* op = dynamic_cast<Lexer_operation*> (post_arr[k][j]);
-					if (op->code == op_un_min) stack.top()->a = -stack.top()->a;
-					else if (op->code != op_un_plus) {
+					if (op->code >= op_un_plus) {
+						switch (op->code)
+						{
+						case op_un_min:
+							stack.top()->a = -stack.top()->a;
+							break;
+						case op_exp:
+							stack.top()->a = exp(stack.top()->a);
+							break;
+						case op_cos:
+							stack.top()->a = cos(stack.top()->a);
+							break;
+						case op_sin:
+							stack.top()->a = sin(stack.top()->a);
+							break;
+						case op_ln:
+							if (stack.top()->a <= 0.0) throw exception();
+							stack.top()->a = log(stack.top()->a);
+							break;
+						default:
+							break;
+						}
+						
+					}
+					else {
 						real tmp = stack.top()->a;
 						stack.pop();
 						switch (op->code)
@@ -185,10 +229,14 @@ real TFormula::calc()
 							stack.top()->a *= tmp;
 							break;
 						case op_div:
+							if (tmp == 0.0) throw exception();
 							stack.top()->a /= tmp;
 							break;
 						case op_pow:
 							stack.top()->a = pow(stack.top()->a, tmp);
+							break;
+						case op_set:
+							stack.top()->a = tmp;
 							break;
 						default:
 							break;
@@ -218,6 +266,22 @@ void TFormula::show_postfix()
 		cout << endl;
 	}
 	cout << endl;
+}
+
+string TFormula::make_name(string a, int& j)
+{
+	string name;
+	for (; j < a.size() && ((a[j] >= 'A' && a[j] <= 'Z') || (a[j] >= 'a' && a[j] <= 'z')); ++j) {
+		name.push_back(a[j]);
+	}
+	//if (op_list.find(name) != op_list.end()) return op_list[name];
+	//else if (name_list.find(name) == name_list.end()) {
+	//	Lexer* num = new Lexer_real();
+	//	name_list.emplace(name, num);
+	//}
+	//else return name_list[name];
+	--j;
+	return name;
 }
 
 bool Lexer_operation::operator==(char op)
@@ -296,10 +360,11 @@ Lexer_operation::Lexer_operation(const operation_enum& op)
 {
 	code = op;
 	if (op == open_bracket || op == close_bracket) priority = 0;
-	else if (op == op_plus || op == op_minus) priority = 1;
-	else if (op == op_mult || op == op_div) priority = 2;
-	else if (op == op_pow) priority = 3;
-	else priority = 4;
+	else if(op==op_set) priority = 0;
+	else if (op == op_plus || op == op_minus) priority = 2;
+	else if (op == op_mult || op == op_div) priority = 3;
+	else if (op == op_pow) priority = 4;
+	else priority = 5;
 }
 
 ostream& operator<<(ostream& out,const Lexer& lex)
@@ -309,6 +374,16 @@ ostream& operator<<(ostream& out,const Lexer& lex)
 	else if (const Lexer_real * num = dynamic_cast<const Lexer_real*> (&lex))
 		out << *num;
 	return out;
+}
+
+istream& operator<<(istream& inp, TFormula& form)
+{
+	while (!cin.eof()) {
+		string arr;
+		cin >> arr;
+		form.orig_exp_arr.push_back(arr);
+	}
+	return inp;
 }
 
 ostream& operator<<(ostream& out, const Lexer_operation& op)
@@ -336,9 +411,25 @@ ostream& operator<<(ostream& out, const Lexer_operation& op)
 	case op_pow:
 		out << '^';
 		break;
+	case op_cos:
+		out << "cos";
+		break;
+	case op_sin:
+		out << "sin";
+		break;
+	case op_exp:
+		out << "exp";
+		break;
+	case op_ln:
+		out << "ln";
+		break;
+	case op_set:
+		out << "=";
+		break;
 	default:
 		throw exception();
 		break;
 	}
 	return out;
 }
+
