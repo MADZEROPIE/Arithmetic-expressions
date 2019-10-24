@@ -10,5 +10,6 @@ script:
   - make -j
   - cd ./bin/
   - ./test_stack
+  - ./test_TFormula
 notifications:
   email: false
