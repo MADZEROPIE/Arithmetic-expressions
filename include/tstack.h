@@ -104,6 +104,15 @@ inline void TStack<T>::pop(void)
 {
 	if (IsEmpty()) throw "No elements here";
 	--DataCount;
+	if (DataCount < (3 * MemSize / 4)) { 
+		MemSize = 3 * MemSize / 4 + 1;
+		T* tmp = new T[MemSize];
+		for (int i = 0; i < DataCount;++i) tmp[i] = pMem[i];
+		delete[] pMem;
+		pMem = tmp;
+	}
+
+	
 }
 
 template<typename T>
