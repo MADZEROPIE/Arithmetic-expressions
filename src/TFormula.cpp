@@ -111,7 +111,12 @@ bool TFormula::check_exp()
 					string name=make_name(orig_exp,k);
 					if (op_list.find(name) != op_list.end()) { arr[i].push_back(op_list[name]); wait_for_num = true; }
 					else if (name_list.find(name) != name_list.end()) {
-						arr[i].push_back(name_list[name]); current_state = WAIT_FOR_OP;
+						arr[i].push_back(name_list[name]); 
+						if (k + 1 < orig_exp.size() && orig_exp[k + 1] == '='){
+							arr[i].push_back(op_list["="]);
+							++k;
+						}
+						else current_state = WAIT_FOR_OP;
 					}
 					else if (k + 1 < orig_exp.size() && orig_exp[k+1] == '=') {
 						Lexeme* num = new Lexeme_var(name);
