@@ -58,7 +58,7 @@ class Lexeme_var : public Lexeme_real {
 protected:
 	string name;
 public:
-	Lexeme_var(string _name) { name = _name; }
+	Lexeme_var(const string& _name) { name = _name; }
 	friend ostream& operator<< (ostream& out, const Lexeme_var& var) {
 		return out << var.name;
 	}

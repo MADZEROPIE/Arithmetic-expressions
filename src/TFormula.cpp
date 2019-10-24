@@ -285,7 +285,7 @@ ostream& operator<<(ostream& out,const Lexeme& lex)
 {
 	if (const Lexeme_operation * op = dynamic_cast<const Lexeme_operation*> (&lex))
 		out << *op;
-	else if (const Lexeme_real * var = dynamic_cast<const Lexeme_var*> (&lex))
+	else if (const Lexeme_var * var = dynamic_cast<const Lexeme_var*> (&lex))
 		out << *var;
 	else if (const Lexeme_real * num = dynamic_cast<const Lexeme_real*> (&lex))
 		out << *num;
