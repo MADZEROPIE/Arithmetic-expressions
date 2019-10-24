@@ -187,7 +187,6 @@ TEST(TFormula, can_calculate_difficult_arifmetical_expression_6)
 	TFormula a(vec);
 	ASSERT_EQ(true, a.check_exp());
 	ASSERT_NO_THROW(a.make_postfix());
-	a.show_postfix();
 	double res = 8;
 	ASSERT_DOUBLE_EQ(res, a.calc());
 }
