@@ -18,7 +18,7 @@ void TFormula::make_postfix()
 					}
 					stack.pop();
 				}
-				else if (*op > * stack.top()) stack.push(op);
+				else if (op->priority >  stack.top()->priority) stack.push(op);
 				else {
 					post_arr[i].push_back(dynamic_cast<Lexer*>(stack.top()));
 					stack.pop();
@@ -70,12 +70,12 @@ TFormula::TFormula() //Копипаста - это плохо...
 
 TFormula::~TFormula()
 {
-//	for(int i=0;i<arr.size();++i) 
-	//	for (auto elem : arr[i]) 
-//			if(dynamic_cast<Lexer_real*>(elem) ) 
-				//delete elem;
-//	for (auto it = name_list.begin(); it != name_list.end(); ++it) delete it->second;
-//	for (auto it = op_list.begin(); it != op_list.end(); ++it) delete it->second;
+	for(int i=0;i<arr.size();++i) 
+		for (auto elem : arr[i]) 
+			if(dynamic_cast<Lexer_real*>(elem) && (!(dynamic_cast<Lexer_var*>(elem) )))
+				delete elem;
+	for (auto it = name_list.begin(); it != name_list.end(); ++it) delete it->second;
+	for (auto it = op_list.begin(); it != op_list.end(); ++it) delete it->second;
 
 	//Все указатели лежат в arr, поэтому не надо удалять элементы в post_arr
 }
@@ -88,6 +88,7 @@ bool TFormula::check_exp()
 		TStack<char> brackets;
 		string orig_exp = orig_exp_arr[i];
 		int k = 0;
+		bool wait_for_num = false;
 		for (; k < orig_exp.size(); ++k) {
 			// Состояние 0
 			if (current_state == ORIGIN_STATE) {
@@ -113,6 +114,7 @@ bool TFormula::check_exp()
 					k = j - 1;
 					Lexer* num = new Lexer_real(tmp);
 					arr[i].push_back(num);
+					wait_for_num = false;
 					current_state = WAIT_FOR_OP;
 				}
 				else if (orig_exp[k] == '(') {
@@ -136,12 +138,12 @@ bool TFormula::check_exp()
 				}
 				else if ((orig_exp[k] >= 'A' && orig_exp[k] <= 'Z') || (orig_exp[k] >= 'a' && orig_exp[k] <= 'z')) {
 					string name=make_name(orig_exp,k);
-					if (op_list.find(name) != op_list.end()) { arr[i].push_back(op_list[name]); }
+					if (op_list.find(name) != op_list.end()) { arr[i].push_back(op_list[name]); wait_for_num = true; }
 					else if (name_list.find(name) != name_list.end()) {
 						arr[i].push_back(name_list[name]); current_state = WAIT_FOR_OP;
 					}
 					else if (k + 1 < orig_exp.size() && orig_exp[k+1] == '=') {
-						Lexer* num = new Lexer_real(0);
+						Lexer* num = new Lexer_var(name);
 						name_list.emplace(name, num);
 						arr[i].push_back(num);
 						arr[i].push_back(op_list["="]);
@@ -153,7 +155,10 @@ bool TFormula::check_exp()
 			}
 			//Закончен ввод числа, ожидание операции
 			else if (current_state == WAIT_FOR_OP) {
-				if (orig_exp[k] == '+' || orig_exp[k] == '-' || orig_exp[k] == '*' || orig_exp[k] == '/' || orig_exp[k] == '^') {
+				if (wait_for_num) {
+					current_state = ERROR; k = orig_exp.size();
+				}
+				else if (orig_exp[k] == '+' || orig_exp[k] == '-' || orig_exp[k] == '*' || orig_exp[k] == '/' || orig_exp[k] == '^') {
 					string op = { orig_exp[k] };
 					//Lexer* op = new Lexer_operation(orig_exp[k]);
 					arr[i].push_back(op_list[op]);
@@ -172,7 +177,9 @@ bool TFormula::check_exp()
 				else { current_state = ERROR; k = orig_exp.size(); }
 			}
 		}
-		if (current_state == ERROR || !(brackets.IsEmpty())) return false;
+		if (current_state == ERROR || !(brackets.IsEmpty()) || wait_for_num) {
+			current_state = ERROR; return false;
+		}
 		else current_state = ORIGIN_STATE;
 	}
 	if (current_state == ORIGIN_STATE) current_state=CHECK_DONE;
@@ -274,86 +281,8 @@ string TFormula::make_name(string a, int& j)
 	for (; j < a.size() && ((a[j] >= 'A' && a[j] <= 'Z') || (a[j] >= 'a' && a[j] <= 'z')); ++j) {
 		name.push_back(a[j]);
 	}
-	//if (op_list.find(name) != op_list.end()) return op_list[name];
-	//else if (name_list.find(name) == name_list.end()) {
-	//	Lexer* num = new Lexer_real();
-	//	name_list.emplace(name, num);
-	//}
-	//else return name_list[name];
 	--j;
 	return name;
-}
-
-bool Lexer_operation::operator==(char op)
-{
-	bool res;
-	switch (op)
-	{
-	case '(':
-		res= (code == open_bracket);
-		break;
-	case ')':
-		res = (code == close_bracket);
-		break;
-	case '+':
-		res = (code == op_plus);
-		break;
-	case '-':
-		res = (code == op_minus);
-		break;
-	case '*':
-		res = (code == op_mult);
-		break;
-	case '/':
-		res = (code == op_div);
-		break;
-	case '^':
-		res = (code == op_pow);
-		break;
-	default:
-		res = false;
-		break;
-	}
-	return res;
-}
-
-Lexer_operation::Lexer_operation (const char& op) {
-	switch (op)
-	{
-	case '(':
-		priority = 0;
-		code = open_bracket;
-		break;
-	case ')':
-		priority = 0;
-		code = close_bracket;
-		break;
-	case '+':
-		priority = 1;
-		code = op_plus;
-		break;
-	case '-':
-		priority = 1;
-		code = op_minus;
-		break;
-	case '*':
-		priority = 2;
-		code = op_mult;
-		break;
-	case '/':
-		priority = 2;
-		code = op_div;
-		break;
-	case '^':
-		priority = 3;
-		code = op_pow;
-		break;
-	default:
-		priority = -1;
-		code = op_pow;
-		throw exception();
-		break;
-	}
 }
 
 Lexer_operation::Lexer_operation(const operation_enum& op)
@@ -371,8 +300,11 @@ ostream& operator<<(ostream& out,const Lexer& lex)
 {
 	if (const Lexer_operation * op = dynamic_cast<const Lexer_operation*> (&lex))
 		out << *op;
+	else if (const Lexer_real * var = dynamic_cast<const Lexer_var*> (&lex))
+		out << *var;
 	else if (const Lexer_real * num = dynamic_cast<const Lexer_real*> (&lex))
 		out << *num;
+	else throw exception();
 	return out;
 }
 

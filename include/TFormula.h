@@ -8,7 +8,8 @@
 typedef double real;
 
 enum state_enum { WAIT_FOR_INPUT, ORIGIN_STATE, WAIT_FOR_OP ,ERROR , CHECK_DONE, POSTFIX_DONE }; //Перечисление состояний
-enum operation_enum {open_bracket, close_bracket, op_set, op_plus, op_minus, op_mult, op_div, op_pow, op_un_plus, op_un_min, op_exp, op_cos, op_sin, op_ln };
+enum operation_enum {open_bracket, close_bracket, op_set, op_plus, op_minus, op_mult, op_div, op_pow, op_un_plus, op_un_min, op_exp, op_cos, op_sin, op_ln }; //Перечисление операций
+//Добавить операцию make_coffee или coffee, при выполнении которой throw "cup of coffee"
 
 class Lexer {
 public:
@@ -44,12 +45,23 @@ public:
 class Lexer_real:public Lexer {
 public:
 	real a;
-
+	Lexer_real() {}
 	Lexer_real(const real& b) { a = b; }
 	friend ostream& operator<< (ostream& out, const Lexer_real& num) {
 		return out << num.a;
 	}
 	~Lexer_real() {}
+};
+
+class Lexer_var : public Lexer_real {
+protected:
+	string name;
+public:
+	Lexer_var(string _name) { name = _name; }
+	friend ostream& operator<< (ostream& out, const Lexer_var& var) {
+		return out << var.name;
+	}
+	~Lexer_var() {}
 };
 
 class Lexer_operation : public Lexer {
@@ -58,10 +70,6 @@ public:
 	operation_enum code;
 
 	friend ostream& operator<< (ostream& out, const Lexer_operation& op);
-	bool operator==(char op);
-	bool operator>(const Lexer_operation& b) { return priority > b.priority; }
-
-	Lexer_operation(const char& op);
 	Lexer_operation(const operation_enum& op);
 	~Lexer_operation() {}
 };
