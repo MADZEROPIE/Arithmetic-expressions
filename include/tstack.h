@@ -75,13 +75,11 @@ template<typename T>
 inline void TStack<T>::push(const T& Val)
 {
 	if (IsFull()) {
+		MemSize = MemSize + MemSize / 3 + 1;
 		T* tmp = new T[MemSize];
 		for (int i = 0; i < DataCount; ++i) tmp[i]= pMem[i];
 		delete[] pMem;
-		MemSize = MemSize + MemSize / 3 + 1;
-		pMem = new T[MemSize];
-		for (int i = 0; i < DataCount; ++i) pMem[i] = tmp[i];
-		delete[] tmp;
+		pMem = tmp;
 	}
 	pMem[DataCount++] = Val;
 }

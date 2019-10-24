@@ -23,7 +23,8 @@ public:
 	void shift() { //Перемещение элементов из 1 стека во второй
 		if (st2.IsEmpty()) {
 			while (!st1.IsEmpty())
-			st2.push(st1.pop());
+			st2.push(st1.top());
+			st1.pop();
 		}
 	}
 };
