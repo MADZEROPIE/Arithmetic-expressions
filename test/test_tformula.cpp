@@ -180,3 +180,14 @@ TEST(TFormula, can_calculate_difficult_arifmetical_expression_5)
 	double res = cos(1 + 174) - 3 + pow((7 * 2 + 3), 2)+sin(2)+log(75);
 	ASSERT_DOUBLE_EQ(res, a.calc());
 }
+
+TEST(TFormula, can_calculate_difficult_arifmetical_expression_6)
+{
+	vector<string> vec = { "a=2+myb=3","a+myb" };
+	TFormula a(vec);
+	ASSERT_EQ(true, a.check_exp());
+	ASSERT_NO_THROW(a.make_postfix());
+	a.show_postfix();
+	double res = 8;
+	ASSERT_DOUBLE_EQ(res, a.calc());
+}

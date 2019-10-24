@@ -18,6 +18,7 @@ void TFormula::make_postfix()
 					}
 					stack.pop();
 				}
+				else if (op->code==op_set) stack.push(op);
 				else if (op->priority >  stack.top()->priority) stack.push(op);
 				else {
 					post_arr[i].push_back(static_cast<Lexeme*>(stack.top()));
