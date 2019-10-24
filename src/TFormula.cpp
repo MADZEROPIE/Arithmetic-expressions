@@ -149,7 +149,7 @@ bool TFormula::check_exp()
 						arr[i].push_back(op_list["="]);
 						++k;
 					}
-					else arr[i].push_back(name_list[name]);
+					else { current_state = ERROR; k = orig_exp.size(); }
 				}
 				else { current_state = ERROR; k = orig_exp.size(); }
 			}
