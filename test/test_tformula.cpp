@@ -183,7 +183,7 @@ TEST(TFormula, can_calculate_difficult_arifmetical_expression_5)
 
 TEST(TFormula, can_calculate_difficult_arifmetical_expression_6)
 {
-	vector<string> vec = { "a=2+myb=3","a+myb" };
+	vector<string> vec = { "a=2+(myb=3)","a+myb" };
 	TFormula a(vec);
 	ASSERT_EQ(true, a.check_exp());
 	ASSERT_NO_THROW(a.make_postfix());
