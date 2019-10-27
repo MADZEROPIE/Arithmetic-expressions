@@ -166,30 +166,34 @@ real TFormula::calc()
 	if (current_state != POSTFIX_DONE) return 0.0;
 	real res = 0.0;
 	if (post_arr.size() != 0) {
-		TStack<Lexeme_real*> stack;
+		TStack<real> stack;
+		TQueue <Lexeme_var*> var_stack;
 		for (int k = 0; k < post_arr.size(); ++k) {
 			for (int j = 0; j < post_arr[k].size(); ++j) {
-				if (dynamic_cast<Lexeme_real*>(post_arr[k][j])) stack.push(dynamic_cast<Lexeme_real*>(post_arr[k][j]));
+				if (dynamic_cast<Lexeme_real*>(post_arr[k][j])) { 
+					stack.push(static_cast<Lexeme_real*>(post_arr[k][j])->a);
+					if (dynamic_cast<Lexeme_var*>(post_arr[k][j])) var_stack.push(static_cast<Lexeme_var*>(post_arr[k][j]));
+				}
 				else {
 					Lexeme_operation* op = dynamic_cast<Lexeme_operation*> (post_arr[k][j]);
 					if (op->code >= op_un_plus) {
 						switch (op->code)
 						{
 						case op_un_min:
-							stack.top()->a = -stack.top()->a;
+							stack.top() = -stack.top();
 							break;
 						case op_exp:
-							stack.top()->a = exp(stack.top()->a);
+							stack.top() = exp(stack.top());
 							break;
 						case op_cos:
-							stack.top()->a = cos(stack.top()->a);
+							stack.top() = cos(stack.top());
 							break;
 						case op_sin:
-							stack.top()->a = sin(stack.top()->a);
+							stack.top() = sin(stack.top());
 							break;
 						case op_ln:
-							if (stack.top()->a <= 0.0) throw exception();
-							stack.top()->a = log(stack.top()->a);
+							if (stack.top() <= 0.0) throw exception();
+							stack.top() = log(stack.top());
 							break;
 						default:
 							break;
@@ -197,28 +201,30 @@ real TFormula::calc()
 						
 					}
 					else {
-						real tmp = stack.top()->a;
+						real tmp = stack.top();
 						stack.pop();
 						switch (op->code)
 						{
 						case op_plus:
-							stack.top()->a += tmp;
+							stack.top() += tmp;
 							break;
 						case op_minus:
-							stack.top()->a -= tmp;
+							stack.top() -= tmp;
 							break;
 						case op_mult:
-							stack.top()->a *= tmp;
+							stack.top() *= tmp;
 							break;
 						case op_div:
 							if (tmp == 0.0) throw exception();
-							stack.top()->a /= tmp;
+							stack.top() /= tmp;
 							break;
 						case op_pow:
-							stack.top()->a = pow(stack.top()->a, tmp);
+							stack.top() = pow(stack.top(), tmp);
 							break;
 						case op_set:
-							stack.top()->a = tmp;
+							stack.top() = tmp;
+							var_stack.top()->a = tmp;
+							var_stack.pop();
 							break;
 						default:
 							break;
@@ -226,7 +232,7 @@ real TFormula::calc()
 					}
 				}
 			}
-			res = stack.top()->a;
+			res = stack.top();
 		}
 	}
 	return res;

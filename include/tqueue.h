@@ -16,15 +16,16 @@ public:
 		shift();
 		return st2.pop();
 	}
-	T top(void) {
+	T& top(void) {
 		shift();
 		return st2.top();
 	}
 	void shift() { //Перемещение элементов из 1 стека во второй
 		if (st2.IsEmpty()) {
-			while (!st1.IsEmpty())
-			st2.push(st1.top());
-			st1.pop();
+			while (!(st1.IsEmpty())) {
+				st2.push(st1.top());
+				st1.pop();
+			}
 		}
 	}
 };

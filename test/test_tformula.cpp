@@ -131,6 +131,56 @@ TEST(TFormula, can_calculate_simple_arifmetical_expression_7)
 	ASSERT_DOUBLE_EQ(res, a.calc());
 }
 
+TEST(TFormula, can_set_variable_1)
+{
+	vector<string> vec = { "res=3" };
+	TFormula a(vec);
+	a.check_exp();
+	ASSERT_NO_THROW(a.make_postfix());
+	double res = 3;
+	ASSERT_NO_THROW(a.calc());
+	ASSERT_DOUBLE_EQ(res, a["res"]);
+}
+
+TEST(TFormula, can_set_variable_2)
+{
+	vector<string> vec = { "res=-(-10.2)*5+2^(2*3)/72+cos(5)" };
+	TFormula a(vec);
+	a.check_exp();
+	ASSERT_NO_THROW(a.make_postfix());
+	double res = -(-10.2) * 5 + pow(2 , (2.0 * 3.0)) / 72.0 + cos(5);
+	ASSERT_NO_THROW(a.calc());
+	ASSERT_DOUBLE_EQ(res, a["res"]);
+}
+
+TEST(TFormula, can_set_variable_3)
+{
+	vector<string> vec = { "a=3","myb=7*2+a" };
+	TFormula form(vec);
+	form.check_exp();
+	ASSERT_NO_THROW(form.make_postfix());
+	double a = 3.0;
+	double myb = 7.0 * 2.0 + a;
+	ASSERT_NO_THROW(form.calc());
+	ASSERT_DOUBLE_EQ(a, form["a"]);
+	ASSERT_DOUBLE_EQ(myb, form["myb"]);
+
+}
+
+TEST(TFormula, can_set_variable_4)
+{
+	vector<string> vec = { "a=3","myb=7*2+a","cos(1+174)-a+myb^2" };
+	TFormula form(vec);
+	form.check_exp();
+	ASSERT_NO_THROW(form.make_postfix());
+	double a = 3.0;
+	double myb = 7.0 * 2.0 + a;
+	ASSERT_NO_THROW(form.calc());
+	ASSERT_DOUBLE_EQ(a, form["a"]);
+	ASSERT_DOUBLE_EQ(myb, form["myb"]);
+
+}
+
 TEST(TFormula, can_calculate_difficult_arifmetical_expression_1)
 {
 	vector<string> vec = { "-(-10.2)*5+2^(2*3)/72","-(-10.2)*5+2^(2*3)/72" };

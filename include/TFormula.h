@@ -1,5 +1,6 @@
 #pragma once
 #include "tstack.h"
+#include "tqueue.h"
 #include <string>
 #include <vector>
 #include <cmath>
@@ -17,33 +18,7 @@ public:
 	virtual ~Lexeme() {}
 }; //Äëÿ up-cast
 
-class TFormula {
-private:
-	vector<string> orig_exp_arr;
-	vector<vector<Lexeme*> >arr;
-	vector<vector<Lexeme*> > post_arr;
-	map<string, Lexeme*> op_list;
-	map<string, Lexeme*> name_list; 
-	state_enum current_state = ORIGIN_STATE;
-	string make_name(string& a, int& i);
-	void make_op_list();
-public:
-	TFormula();
-	TFormula(const string& a) :TFormula() { orig_exp_arr.push_back(a); current_state = ORIGIN_STATE; }
-	TFormula(const vector<string>& vec): TFormula() { orig_exp_arr = vec; current_state = ORIGIN_STATE;	}
-	~TFormula();
-	bool check_exp();
-	void make_postfix();
-	real calc();
-	void show_lex();
-	void show_postfix();
-	friend istream& operator<< (istream& inp, TFormula& form);
-	
-};
-
-
-
-class Lexeme_real:public Lexeme {
+class Lexeme_real :public Lexeme {
 public:
 	real a;
 	Lexeme_real() {}
@@ -73,4 +48,29 @@ public:
 	friend ostream& operator<< (ostream& out, const Lexeme_operation& op);
 	Lexeme_operation(const operation_enum& op);
 	~Lexeme_operation() {}
+};
+
+class TFormula {
+private:
+	vector<string> orig_exp_arr;
+	vector<vector<Lexeme*> >arr;
+	vector<vector<Lexeme*> > post_arr;
+	map<string, Lexeme*> op_list;
+	map<string, Lexeme*> name_list; 
+	state_enum current_state = ORIGIN_STATE;
+	string make_name(string& a, int& i);
+	void make_op_list();
+public:
+	TFormula();
+	TFormula(const string& a) :TFormula() { orig_exp_arr.push_back(a); current_state = ORIGIN_STATE; }
+	TFormula(const vector<string>& vec): TFormula() { orig_exp_arr = vec; current_state = ORIGIN_STATE;	}
+	~TFormula();
+	real& operator[](const string& a) { return static_cast<Lexeme_real*>(name_list[a])->a; }
+	bool check_exp();
+	void make_postfix();
+	real calc();
+	void show_lex();
+	void show_postfix();
+	friend istream& operator<< (istream& inp, TFormula& form);
+	
 };

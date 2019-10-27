@@ -28,7 +28,7 @@ public:
 	void clear() { DataCount = 0; }
 	int size() { return DataCount; }
 	TStack<T>& operator=(const TStack& st);
-	T top() {
+	T& top() {
 		if (IsEmpty()) throw "No elements here.";
 		return pMem[DataCount - 1]; }
 	void pop ( void ) ; // извлечь значение
@@ -129,7 +129,7 @@ public:
 		if (stack.top() == tmp_stack.top()) tmp_stack.pop();
 		stack.pop();
 	}
-	T top() {
+	T& top() {
 		return stack.top();
 	}
 
