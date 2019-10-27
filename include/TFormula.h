@@ -52,25 +52,29 @@ public:
 
 class TFormula {
 private:
-	vector<string> orig_exp_arr;
-	vector<vector<Lexeme*> >arr;
-	vector<vector<Lexeme*> > post_arr;
-	map<string, Lexeme*> op_list;
-	map<string, Lexeme*> name_list; 
-	state_enum current_state = ORIGIN_STATE;
-	string make_name(string& a, int& i);
-	void make_op_list();
+	vector<string> orig_exp_arr; // ћассив исходных строк
+	vector<vector<Lexeme*> >arr; // ћассив массива лексем, где arr[i] соответстует лексемам i строки исходного выражени€
+	vector<vector<Lexeme*> > post_arr; //arr в постфиксной форме
+	map<string, Lexeme*> op_list; //дерево операций
+	map<string, Lexeme*> name_list;  //дерево переменных
+	state_enum current_state; // “екущее состо€ние
+	string make_name(string& a, int& i); //—оздание имени из строки начина€ и i-ого эл-та
+	void make_op_list(); //задает дерево операций
+
 public:
 	TFormula();
 	TFormula(const string& a) :TFormula() { orig_exp_arr.push_back(a); current_state = ORIGIN_STATE; }
 	TFormula(const vector<string>& vec): TFormula() { orig_exp_arr = vec; current_state = ORIGIN_STATE;	}
 	~TFormula();
-	real& operator[](const string& a) { return static_cast<Lexeme_real*>(name_list[a])->a; }
+
+	real& operator[](const string& name) { return static_cast<Lexeme_real*>(name_list[name])->a; } //¬озращает значение переменной c именем name
+
 	bool check_exp();
 	void make_postfix();
 	real calc();
-	void show_lex();
-	void show_postfix();
+
+	void show_lex(); //вывод лексем
+	void show_postfix(); //вывод лексем в постфиксной форме
 	friend istream& operator<< (istream& inp, TFormula& form);
 	
 };

@@ -167,12 +167,12 @@ real TFormula::calc()
 	real res = 0.0;
 	if (post_arr.size() != 0) {
 		TStack<real> stack;
-		TQueue <Lexeme_var*> var_stack;
+		TQueue <Lexeme_var*> var_queue;
 		for (int k = 0; k < post_arr.size(); ++k) {
 			for (int j = 0; j < post_arr[k].size(); ++j) {
 				if (dynamic_cast<Lexeme_real*>(post_arr[k][j])) { 
 					stack.push(static_cast<Lexeme_real*>(post_arr[k][j])->a);
-					if (dynamic_cast<Lexeme_var*>(post_arr[k][j])) var_stack.push(static_cast<Lexeme_var*>(post_arr[k][j]));
+					if (dynamic_cast<Lexeme_var*>(post_arr[k][j])) var_queue.push(static_cast<Lexeme_var*>(post_arr[k][j]));
 				}
 				else {
 					Lexeme_operation* op = dynamic_cast<Lexeme_operation*> (post_arr[k][j]);
@@ -223,8 +223,8 @@ real TFormula::calc()
 							break;
 						case op_set:
 							stack.top() = tmp;
-							var_stack.top()->a = tmp;
-							var_stack.pop();
+							var_queue.top()->a = tmp;
+							var_queue.pop();
 							break;
 						default:
 							break;
