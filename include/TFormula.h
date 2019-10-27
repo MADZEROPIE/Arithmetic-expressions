@@ -6,6 +6,8 @@
 #include <cmath>
 #include <map>
 
+#define prefix_stringify(something) std::string(#something)
+
 typedef double real;
 
 enum state_enum { WAIT_FOR_INPUT, ORIGIN_STATE, WAIT_FOR_OP ,ERROR , CHECK_DONE, POSTFIX_DONE }; //ѕеречисление состо€ний
@@ -34,9 +36,12 @@ protected:
 	string name;
 public:
 	Lexeme_var(const string& _name) { name = _name; }
+	Lexeme_var(const string& _name, real num) { name = _name; a = num; }//ј можно делегировать конструкторы
+
 	friend ostream& operator<< (ostream& out, const Lexeme_var& var) {
 		return out << var.name;
 	}
+
 	~Lexeme_var() {}
 };
 
@@ -72,6 +77,7 @@ public:
 	bool check_exp();
 	void make_postfix();
 	real calc();
+	real& add_var(const string& name, real num=0.0);
 
 	void show_lex(); //вывод лексем
 	void show_postfix(); //вывод лексем в постфиксной форме

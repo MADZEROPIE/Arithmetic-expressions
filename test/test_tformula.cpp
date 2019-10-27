@@ -181,6 +181,18 @@ TEST(TFormula, can_set_variable_4)
 
 }
 
+TEST(TFormula, can_add_variable_1)
+{
+	vector<string> vec = { "res+3" };
+	TFormula a(vec);
+	double res = 4.0;
+	a.add_var("res", 4.0);
+	ASSERT_EQ(true, a.check_exp());
+	ASSERT_NO_THROW(a.make_postfix());
+	ASSERT_NO_THROW(a.calc());
+	ASSERT_DOUBLE_EQ(4.0, a["res"]);
+}
+
 TEST(TFormula, can_calculate_difficult_arifmetical_expression_1)
 {
 	vector<string> vec = { "-(-10.2)*5+2^(2*3)/72","-(-10.2)*5+2^(2*3)/72" };

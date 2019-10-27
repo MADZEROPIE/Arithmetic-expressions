@@ -238,6 +238,20 @@ real TFormula::calc()
 	return res;
 }
 
+real& TFormula::add_var(const string& name, real num)
+{
+	if (name_list.find(name) == name_list.end()) {
+		Lexeme* pLexeme_var = new Lexeme_var(name, num);
+		name_list.emplace(name, pLexeme_var);
+		return static_cast<Lexeme_real*>(pLexeme_var)->a;
+	}
+	else {
+		Lexeme_real* pLexeme_var = static_cast<Lexeme_real*> (name_list[name]);
+		pLexeme_var->a = num;
+		return pLexeme_var->a;
+	}
+}
+
 void TFormula::show_lex()
 {
 	for (int k = 0; k < arr.size();++k) {
