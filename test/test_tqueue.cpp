@@ -1,6 +1,7 @@
 #include "tqueue.h"
 
-#include<gtest.h>
+#include <gtest.h>
+#include <queue>
 
 
 TEST(TQueue, can_create_queue_with_positive_length)
@@ -58,4 +59,18 @@ TEST(TQueue, empty_queue_is_empty) {
 TEST(TQueue, new_queue_is_empty) {
 	TQueue<int> qu(2);
 	EXPECT_EQ(1, qu.IsEmpty());
+}
+
+TEST(TQueue, ultimate_test) {
+	TQueue<int> qu(2);
+	std::queue<int> exp_qu;
+	for (int i = 0; i < 15; ++i) {
+		qu.push(i);
+		exp_qu.push(i);
+	}
+	for (int i = 0; i < 15; ++i) {
+		EXPECT_EQ(qu.top(), exp_qu.front());
+		qu.pop();
+		exp_qu.pop();
+	}
 }
