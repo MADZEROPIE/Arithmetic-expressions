@@ -42,7 +42,7 @@ protected:
 	size_t head;
 	size_t tail;
 	size_t size;
-
+	size_t DataCount=0; //нужно дл€ провеки на пустоту, иначе непон€тно как провер€ть
 public:
 	TQueue(int Size=10) {
 		if (Size < 0) throw exception();
@@ -69,7 +69,7 @@ public:
 		}
 		arr[(tail-1)%size] = data;
 		tail = (tail + 1) % size;
-		
+		++DataCount;
 	}
 	T& top() {
 		if (IsEmpty()) throw exception();
@@ -78,8 +78,9 @@ public:
 	void pop() {
 		if (IsEmpty()) throw exception();
 		head = (head + 1) % size;
+		--DataCount;
 	}
 	bool IsEmpty() { 
-		return (tail-head)==1|| head-tail==1; //некорректно (?) 
+		return DataCount==0; //корректно, но лишн€€ пам€ть 
 	}
 };

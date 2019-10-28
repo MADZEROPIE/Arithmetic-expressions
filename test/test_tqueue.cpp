@@ -50,7 +50,7 @@ TEST(TQueue, can_push_and_get_element_4) {
 
 TEST(TQueue, empty_queue_is_empty) {
 	TQueue<int> qu(2);
-	const int a = 15, b = 20, c = 7;
+	const int a = 15;
 	ASSERT_NO_THROW(qu.push(a));
 	ASSERT_NO_THROW(qu.pop());
 	EXPECT_EQ(1, qu.IsEmpty());
@@ -59,6 +59,16 @@ TEST(TQueue, empty_queue_is_empty) {
 TEST(TQueue, new_queue_is_empty) {
 	TQueue<int> qu(2);
 	EXPECT_EQ(1, qu.IsEmpty());
+}
+
+TEST(TQueue, queue_is_empty) {
+	TQueue<int> qu(5);
+	const int a = 15;
+	for (int i = 0; i < 17; ++i) {
+		ASSERT_NO_THROW(qu.push(a));
+		ASSERT_NO_THROW(qu.pop());
+		ASSERT_EQ(1, qu.IsEmpty());
+	}
 }
 
 TEST(TQueue, ultimate_test) {
