@@ -6,7 +6,7 @@ before_script:
   - mkdir ../build
   - cd ../build
 script:
-  - cmake ../Arifmetic-expressions
+  - cmake ../Arithmetic-expressions
   - make -j
   - cd ./bin/
   - ./test_stack
