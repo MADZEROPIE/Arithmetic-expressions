@@ -44,15 +44,8 @@ TFormula::TFormula()
 
 TFormula::~TFormula()
 {
-	for (int i = 0; i < arr.size(); ++i) {
-		for (auto elem : arr[i])
-			if (dynamic_cast<Lexeme_real*>(elem) && (!(dynamic_cast<Lexeme_var*>(elem))))
-				delete elem;
-	}
-	for (auto it = name_list.begin(); it != name_list.end(); ++it) delete it->second;
+	clear();
 	for (auto it = op_list.begin(); it != op_list.end(); ++it) delete it->second;
-
-	//Все указатели лежат в arr, поэтому не надо удалять элементы в post_arr
 }
 
 bool TFormula::check_exp()
@@ -61,7 +54,7 @@ bool TFormula::check_exp()
 	post_arr.resize(orig_exp_arr.size());
 	for (int i = 0; i < orig_exp_arr.size(); ++i) {
 		TStack<char> brackets;
-		string& orig_exp = orig_exp_arr[i];
+		std::string& orig_exp = orig_exp_arr[i];
 		int k = 0;
 		bool wait_for_num = false;
 		for (; k < orig_exp.size(); ++k) {
@@ -109,7 +102,7 @@ bool TFormula::check_exp()
 					}
 				}
 				else if ((orig_exp[k] >= 'A' && orig_exp[k] <= 'Z') || (orig_exp[k] >= 'a' && orig_exp[k] <= 'z')) {
-					string name=make_name(orig_exp,k);
+					std::string name=make_name(orig_exp,k);
 					if (op_list.find(name) != op_list.end()) { arr[i].push_back(op_list[name]); wait_for_num = true; }
 					else if (name_list.find(name) != name_list.end()) {
 						arr[i].push_back(name_list[name]); 
@@ -136,7 +129,7 @@ bool TFormula::check_exp()
 					current_state = ERROR; k = orig_exp.size();
 				}
 				else if (orig_exp[k] == '+' || orig_exp[k] == '-' || orig_exp[k] == '*' || orig_exp[k] == '/' || orig_exp[k] == '^') {
-					string op = { orig_exp[k] };
+					std::string op = { orig_exp[k] };
 					arr[i].push_back(op_list[op]);
 					int j = k + 1;
 					if (j >= orig_exp.size()) { current_state = ERROR; k = orig_exp.size(); }
@@ -192,7 +185,7 @@ real TFormula::calc()
 							stack.top() = sin(stack.top());
 							break;
 						case op_ln:
-							if (stack.top() <= 0.0) throw exception();
+							if (stack.top() <= 0.0) throw std::exception();
 							stack.top() = log(stack.top());
 							break;
 						default:
@@ -215,7 +208,7 @@ real TFormula::calc()
 							stack.top() *= tmp;
 							break;
 						case op_div:
-							if (tmp == 0.0) throw exception();
+							if (tmp == 0.0) throw std::exception();
 							stack.top() /= tmp;
 							break;
 						case op_pow:
@@ -238,7 +231,7 @@ real TFormula::calc()
 	return res;
 }
 
-real& TFormula::add_var(const string& name, real num)
+real& TFormula::add_var(const std::string& name, real num)
 {
 	if (name_list.find(name) == name_list.end()) {
 		Lexeme* pLexeme_var = new Lexeme_var(name, num);
@@ -252,27 +245,40 @@ real& TFormula::add_var(const string& name, real num)
 	}
 }
 
+void TFormula::clear()
+{
+	for (int i = 0; i < arr.size(); ++i) {
+		for (auto elem : arr[i])
+			if (dynamic_cast<Lexeme_real*>(elem) && (!(dynamic_cast<Lexeme_var*>(elem))))
+				delete elem;
+	}
+	for (auto it = name_list.begin(); it != name_list.end(); ++it) delete it->second;
+	orig_exp_arr.clear();
+	arr.clear();
+	post_arr.clear();
+}
+
 void TFormula::show_lex()
 {
 	for (int k = 0; k < arr.size();++k) {
-		for(int j=0;j<arr[k].size();++j) cout << *arr[k][j] << ' ';
-		cout << endl;
+		for(int j=0;j<arr[k].size();++j) std::cout << *arr[k][j] << ' ';
+		std::cout << std::endl;
 	}
-	cout << endl;
+	std::cout << std::endl;
 }
 
 void TFormula::show_postfix()
 {
 	for (int k = 0; k < post_arr.size(); ++k) {
-		for (int j = 0; j < post_arr[k].size(); ++j) cout << *post_arr[k][j] << ' ';
-		cout << endl;
+		for (int j = 0; j < post_arr[k].size(); ++j) std::cout << *post_arr[k][j] << ' ';
+		std::cout << std::endl;
 	}
-	cout << endl;
+	std::cout << std::endl;
 }
 
-string TFormula::make_name(string& a, int& j)
+std::string TFormula::make_name(std::string& a, int& j)
 {
-	string name;
+	std::string name;
 	for (; j < a.size() && ((a[j] >= 'A' && a[j] <= 'Z') || (a[j] >= 'a' && a[j] <= 'z')); ++j) {
 		name.push_back(a[j]);
 	}
@@ -280,9 +286,9 @@ string TFormula::make_name(string& a, int& j)
 	return name;
 }
 
-void TFormula::make_op_list() //Копипаста - это плохо... Но иначе не сделаешь
+void TFormula::make_op_list()
 {
-	string op_arr[] = { "(" ,")" ,"=","+" ,"-" ,"*" ,"/" ,"^" ,"u+" ,"u-" ,"exp","cos","sin" ,"ln" };
+	std::string op_arr[] = { "(" ,")" ,"=","+" ,"-" ,"*" ,"/" ,"^" ,"u+" ,"u-" ,"exp","cos","sin" ,"ln" };
 	for (int i = 0; i < 14; ++i) {
 		Lexeme* op = new Lexeme_operation (static_cast<operation_enum>(i));
 		op_list.emplace(op_arr[i], op);
@@ -301,7 +307,7 @@ Lexeme_operation::Lexeme_operation(const operation_enum& op)
 	else priority = 5;
 }
 
-ostream& operator<<(ostream& out,const Lexeme& lex)
+std::ostream& operator<<(std::ostream& out,const Lexeme& lex)
 {
 	if (const Lexeme_operation * op = dynamic_cast<const Lexeme_operation*> (&lex))
 		out << *op;
@@ -309,21 +315,23 @@ ostream& operator<<(ostream& out,const Lexeme& lex)
 		out << *var;
 	else if (const Lexeme_real * num = dynamic_cast<const Lexeme_real*> (&lex))
 		out << *num;
-	else throw exception();
+	else throw std::exception();
 	return out;
 }
 
-istream& operator<<(istream& inp, TFormula& form)
+std::istream& operator>>(std::istream& inp, TFormula& form)
 {
-	while (!cin.eof()) {
-		string arr;
-		cin >> arr;
-		form.orig_exp_arr.push_back(arr);
+	form.clear();
+	while (!inp.eof()) {
+		std::string st;
+		inp >> st;
+		if(!inp.eof()) form.orig_exp_arr.push_back(st);
 	}
+	form.current_state = ORIGIN_STATE;
 	return inp;
 }
 
-ostream& operator<<(ostream& out, const Lexeme_operation& op)
+std::ostream& operator<<(std::ostream& out, const Lexeme_operation& op)
 {
 	switch (op.code)
 	{
@@ -364,7 +372,7 @@ ostream& operator<<(ostream& out, const Lexeme_operation& op)
 		out << "=";
 		break;
 	default:
-		throw exception();
+		throw std::exception();
 		break;
 	}
 	return out;

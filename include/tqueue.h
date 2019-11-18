@@ -45,7 +45,7 @@ protected:
 	size_t DataCount=0; //нужно для провеки на пустоту, иначе непонятно как проверять
 public:
 	TQueue(int Size=10) {
-		if (Size < 0) throw exception();
+		if (Size < 0) throw std::exception();
 		arr = new T[Size];
 		size = Size;
 		head =  0;
@@ -72,11 +72,11 @@ public:
 		++DataCount;
 	}
 	T& top() {
-		if (IsEmpty()) throw exception();
+		if (IsEmpty()) throw std::exception();
 		return arr[head];
 	}
 	void pop() {
-		if (IsEmpty()) throw exception();
+		if (IsEmpty()) throw std::exception();
 		head = (head + 1) % size;
 		--DataCount;
 	}

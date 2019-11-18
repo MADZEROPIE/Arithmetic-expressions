@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 
-using namespace std;
+//using namespace std;
 
 //#define STACK_BY_LIST //Закоментировать для реализации стека через массив.
 
@@ -39,7 +39,7 @@ public:
 template<typename T>
 inline TStack<T>::TStack(int Size)
 {
-	if (Size < 0) throw exception();
+	if (Size < 0) throw std::exception();
 	pMem = new T[Size];
 	DataCount = 0;
 	MemSize = Size;
